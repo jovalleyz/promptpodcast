@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Prompt para Podcast</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F7F7F7; /* Light Gray Background */
+            color: #1F2937; /* Dark Gray Text */
+        }
+        .container {
+            max-width: 960px;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 0.75rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+            padding: 1.5rem; /* p-6 */
+            margin-bottom: 1.5rem; /* mb-6 */
+        }
+        .input-field, .textarea-field, .select-field {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem; /* rounded-md */
+            border: 1px solid #D1D5DB; /* border-gray-300 */
+            background-color: #F9FAFB; /* bg-gray-50 */
+            color: #1F2937;
+        }
+        .input-field:focus, .textarea-field:focus, .select-field:focus {
+            outline: none;
+            border-color: #3E92CC; /* brightBlue */
+            box-shadow: 0 0 0 3px rgba(62, 146, 204, 0.2); /* ring-brightBlue */
+        }
+        .btn-primary {
+            background-color: #0A2463; /* Dark Blue */
+            color: #FFFFFF;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #3E92CC; /* Bright Blue */
+        }
+        .btn-secondary {
+            background-color: #FFC43D; /* Gold */
+            color: #0A2463; /* Dark Blue */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-secondary:hover {
+            background-color: #D8315B; /* Accent Pink */
+            color: #FFFFFF;
+        }
+        .btn-primary-alt {
+            background-color: #3E92CC; /* Bright Blue */
+            color: #FFFFFF;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-primary-alt:hover {
+            background-color: #0A2463; /* Dark Blue */
+        }
+        .prompt-output {
+            background-color: #1F2937; /* Dark Gray */
+            color: #F7F7F7; /* Light Gray */
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+            word-wrap: break-word; /* Break long words */
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+
+    <!-- Open Graph / Facebook / WhatsApp Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-app-url.com/"> <!-- Replace with your actual app URL -->
+    <meta property="og:title" content="Generador de Prompt para Podcast">
+    <meta property="og:description" content="Crea tu guion de podcast personalizado para NotebookLLM de forma sencilla.">
+    <meta property="og:image" content="https://placehold.co/1200x630/0A2463/FFFFFF?text=Podcast+Prompt+Generator"> <!-- Placeholder image -->
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://your-app-url.com/"> <!-- Replace with your actual app URL -->
+    <meta name="twitter:title" content="Generador de Prompt para Podcast">
+    <meta name="twitter:description" content="Crea tu guion de podcast personalizado para NotebookLLM de forma sencilla.">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/0A2463/FFFFFF?text=Podcast+Prompt+Generator"> <!-- Placeholder image -->
+</head>
+<body class="antialiased flex flex-col min-h-screen">
+
+    <div class="container mx-auto p-4 md:p-8 flex-grow">
+
+        <header class="text-center py-8">
+            <h1 class="text-3xl md:text-5xl font-black text-[#0A2463] mb-2">Generador de Prompt para Podcast</h1>
+            <p class="text-lg md:text-xl font-bold text-[#D8315B]">Crea tu guion personalizado para NotebookLLM</p>
+        </header>
+
+        <main class="card">
+            <h2 class="text-2xl font-bold text-[#0A2463] mb-6">Información del Podcast</h2>
+
+            <form id="podcastForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label for="podcastTitle" class="block text-sm font-medium text-gray-700 mb-1">Título del Podcast:</label>
+                    <input type="text" id="podcastTitle" class="input-field" placeholder="Ej: Mi Podcast de Tecnología" required>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="mainTopic" class="block text-sm font-medium text-gray-700 mb-1">1. Tema Principal del Podcast:</label>
+                    <input type="text" id="mainTopic" class="input-field" placeholder="Ej: El impacto de la IA en la vida cotidiana" required>
+                </div>
+
+                <div>
+                    <label for="targetAudience" class="block text-sm font-medium text-gray-700 mb-1">2. Público Objetivo:</label>
+                    <textarea id="targetAudience" rows="3" class="textarea-field" placeholder="Ej: Entusiastas de la tecnología, profesionales del sector, público general interesado." required></textarea>
+                </div>
+
+                <div>
+                    <label for="toneStyle" class="block text-sm font-medium text-gray-700 mb-1">3. Tono y Estilo:</label>
+                    <textarea id="toneStyle" rows="3" class="textarea-field" placeholder="Ej: Informativo, conversacional, accesible, con un toque de humor." required></textarea>
+                </div>
+
+                <div>
+                    <label for="estimatedDuration" class="block text-sm font-medium text-gray-700 mb-1">4. Duración Estimada:</label>
+                    <input type="text" id="estimatedDuration" class="input-field" placeholder="Ej: 20-25 minutos" required>
+                </div>
+
+                <div>
+                    <label for="podcastLanguage" class="block text-sm font-medium text-gray-700 mb-1">Idioma del Podcast:</label>
+                    <select id="podcastLanguage" class="select-field" required>
+                        <option value="español latino">Español Latino</option>
+                        <option value="español">Español (General)</option>
+                        <option value="inglés">Inglés</option>
+                        <option value="francés">Francés</option>
+                        <option value="alemán">Alemán</option>
+                        <option value="portugués">Portugués</option>
+                        <option value="chino">Chino</option>
+                        <option value="japonés">Japonés</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="keyPoints" class="block text-sm font-medium text-gray-700 mb-1">5. Puntos Clave o Subtemas a Cubrir (separados por comas o líneas nuevas):</label>
+                    <textarea id="keyPoints" rows="5" class="textarea-field" placeholder="Ej: Definición de IA, aplicaciones actuales, implicaciones éticas, futuro de la IA." required></textarea>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="podcastFormat" class="block text-sm font-medium text-gray-700 mb-1">6. Formato del Podcast (Estructura Sugerida):</label>
+                    <textarea id="podcastFormat" rows="4" class="textarea-field" placeholder="Ej: Intro con música, desarrollo por secciones, segmento de preguntas y respuestas, cierre con llamado a la acción." required></textarea>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="additionalInfo" class="block text-sm font-medium text-gray-700 mb-1">7. Información Adicional / Contexto Específico (Opcional):</label>
+                    <textarea id="additionalInfo" rows="4" class="textarea-field" placeholder="Ej: Incluir estadísticas recientes sobre la adopción de IA."></textarea>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="presentersName" class="block text-sm font-medium text-gray-700 mb-1">Nombres de los Presentadores (Opcional, separados por comas):</label>
+                    <input type="text" id="presentersName" class="input-field" placeholder="Ej: Sofía de Santos, Carlos Riviera">
+                </div>
+
+                <div>
+                    <label for="recordingDateTime" class="block text-sm font-medium text-gray-700 mb-1">Fecha y Hora de Grabación (Opcional):</label>
+                    <input type="text" id="recordingDateTime" class="input-field" placeholder="Ej: 10 de Julio de 2025, 10:00 AM">
+                </div>
+
+                <div>
+                    <label for="greetingsTo" class="block text-sm font-medium text-gray-700 mb-1">Saludos a Negocios o Personas (Opcional, separados por comas):</label>
+                    <input type="text" id="greetingsTo" class="input-field" placeholder="Ej: A nuestros patrocinadores TechSolutions, a Juan Pérez por su pregunta.">
+                </div>
+
+                <div class="md:col-span-2 flex justify-center mt-4 gap-4">
+                    <button type="submit" class="btn-primary">Generar Personalización</button>
+                    <button type="button" id="copyPromptBtn" class="btn-secondary hidden">Copiar Prompt</button>
+                    <button type="button" id="suggestTitlesBtn" class="btn-primary-alt">✨ Sugerir Títulos</button>
+                </div>
+            </form>
+
+            <div id="promptOutputContainer" class="mt-8 hidden">
+                <div class="bg-yellow-100 text-[#1F2937] p-4 rounded-lg mb-4 font-medium">
+                    Recuerda configurar el cuaderno del chat y seleccionar como estilo de conversación la opción "analista" y como longitud de respuesta la opción "larga".
+                </div>
+                <h3 class="text-xl font-bold text-[#0A2463] mb-4">Prompt Generado para NotebookLLM:</h3>
+                <pre id="generatedPrompt" class="prompt-output"></pre>
+            </div>
+
+            <div id="suggestedTitlesContainer" class="mt-8 hidden card">
+                <h3 class="text-xl font-bold text-[#0A2463] mb-4">Títulos Sugeridos:</h3>
+                <div id="loadingTitles" class="text-gray-600 text-center hidden">Cargando sugerencias...</div>
+                <ul id="titlesList" class="list-disc pl-5 text-gray-700"></ul>
+                <div id="titlesError" class="text-red-600 mt-4 hidden"></div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="text-center py-4 mt-8">
+        <p class="text-gray-600 text-sm">Desarrollado con ❤️ para la charla sobre NotebookLLM del grupo Libros gratis sin sorpresas.</p>
+        <p class="text-gray-600 text-sm mt-2">Creado por Jonathan Ovalley. Ovalley Group 2025. Todos los derechos reservados.</p>
+        <p class="text-gray-600 text-sm mt-2">
+            <a href="https://wa.me/18295341802" target="_blank" class="text-[#3E92CC] hover:underline font-bold">Contáctame por WhatsApp</a>
+        </p>
+    </footer>
+
+    <script>
+        document.getElementById('podcastForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const podcastTitle = document.getElementById('podcastTitle').value;
+            const mainTopic = document.getElementById('mainTopic').value;
+            const targetAudience = document.getElementById('targetAudience').value;
+            const toneStyle = document.getElementById('toneStyle').value;
+            const estimatedDuration = document.getElementById('estimatedDuration').value;
+            const keyPoints = document.getElementById('keyPoints').value.split(/[\n,]+/).map(item => item.trim()).filter(item => item !== '').join(', ');
+            const podcastFormat = document.getElementById('podcastFormat').value;
+            const additionalInfo = document.getElementById('additionalInfo').value;
+            const podcastLanguage = document.getElementById('podcastLanguage').value;
+            const presentersName = document.getElementById('presentersName').value;
+            const recordingDateTime = document.getElementById('recordingDateTime').value;
+            const greetingsTo = document.getElementById('greetingsTo').value;
+
+            let prompt = `Instrucciones para el guion del podcast:\n\n`;
+            prompt += `Idioma: ${podcastLanguage}\n`;
+            prompt += `Título del Podcast: "${podcastTitle}"\n`;
+            
+            let introText = `Introducción: Saluda a la audiencia. Da la bienvenida al podcast "${podcastTitle}".`;
+            if (recordingDateTime) {
+                introText += ` Estamos grabando este episodio el ${recordingDateTime}.`;
+            }
+            if (greetingsTo) {
+                introText += ` Un saludo especial a ${greetingsTo}.`;
+            }
+            prompt += `${introText}\n`;
+
+            prompt += `Tema Principal: ${mainTopic}\n`;
+            prompt += `Público Objetivo: ${targetAudience}\n`;
+            prompt += `Tono y Estilo: ${toneStyle}\n`;
+            prompt += `Duración Estimada: ${estimatedDuration}\n`;
+            prompt += `Puntos Clave a Cubrir: ${keyPoints}\n`;
+            prompt += `Formato/Estructura Sugerida: ${podcastFormat}\n`;
+            prompt += `Información Adicional/Contexto: ${additionalInfo || 'Ninguna'}\n`;
+            prompt += `Contenido Detallado: El podcast debe explicar detalladamente el tema principal "${mainTopic}" y los puntos clave mencionados, asegurando que el contenido sea claro y fácil de entender para el público objetivo.\n`;
+            
+            let closingText = `Cierre: Cierra el podcast con reflexiones finales y un llamado a la acción relevante para el tema.`;
+            if (presentersName) {
+                closingText += ` Se despiden ${presentersName}.`;
+            }
+            closingText += ` Invita a la próxima edición del podcast "${podcastTitle}".\n\n`;
+            prompt += `${closingText}`;
+
+            document.getElementById('generatedPrompt').textContent = prompt;
+            document.getElementById('promptOutputContainer').classList.remove('hidden');
+            document.getElementById('copyPromptBtn').classList.remove('hidden');
+        });
+
+        document.getElementById('copyPromptBtn').addEventListener('click', function() {
+            const promptText = document.getElementById('generatedPrompt').textContent;
+            const textArea = document.createElement('textarea');
+            textArea.value = promptText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            const originalText = this.textContent;
+            this.textContent = '¡Copiado!';
+            setTimeout(() => {
+                this.textContent = originalText;
+            }, 2000);
+        });
+
+        document.getElementById('suggestTitlesBtn').addEventListener('click', async function() {
+            const mainTopic = document.getElementById('mainTopic').value;
+            const targetAudience = document.getElementById('targetAudience').value;
+            const toneStyle = document.getElementById('toneStyle').value;
+            const podcastLanguage = document.getElementById('podcastLanguage').value;
+
+            const suggestedTitlesContainer = document.getElementById('suggestedTitlesContainer');
+            const loadingTitles = document.getElementById('loadingTitles');
+            const titlesList = document.getElementById('titlesList');
+            const titlesError = document.getElementById('titlesError');
+
+            // Clear previous results and errors
+            titlesList.innerHTML = '';
+            titlesError.classList.add('hidden');
+            suggestedTitlesContainer.classList.remove('hidden');
+            loadingTitles.classList.remove('hidden');
+            this.disabled = true; // Disable button during loading
+
+            if (!mainTopic || !targetAudience || !toneStyle) {
+                titlesError.textContent = 'Por favor, completa los campos "Tema Principal", "Público Objetivo" y "Tono y Estilo" para sugerir títulos.';
+                titlesError.classList.remove('hidden');
+                loadingTitles.classList.add('hidden');
+                this.disabled = false;
+                return;
+            }
+
+            const promptTextForLLM = `Genera 5 títulos creativos y atractivos para un podcast con el siguiente tema principal: '${mainTopic}', dirigido a '${targetAudience}', con un tono y estilo '${toneStyle}'. Los títulos deben ser en ${podcastLanguage}. Proporciona solo los títulos en un formato de lista JSON.`;
+
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: promptTextForLLM }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "STRING"
+                        }
+                    }
+                }
+            };
+
+            const apiKey = "AIzaSyAMrcsA3c_PsQADJ0Ufv6VgMvSm3t_4FYk"; // Canvas will automatically provide it in runtime
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const json = result.candidates[0].content.parts[0].text;
+                    const parsedJson = JSON.parse(json);
+
+                    if (Array.isArray(parsedJson)) {
+                        parsedJson.forEach(title => {
+                            const li = document.createElement('li');
+                            li.textContent = title;
+                            titlesList.appendChild(li);
+                        });
+                    } else {
+                        titlesError.textContent = 'Error: La respuesta de la API no tiene el formato esperado.';
+                        titlesError.classList.remove('hidden');
+                    }
+                } else {
+                    titlesError.textContent = 'Error: No se pudieron generar títulos. Inténtalo de nuevo.';
+                    titlesError.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error al llamar a la API de Gemini:', error);
+                titlesError.textContent = 'Error al conectar con la API de Gemini. Por favor, inténtalo de nuevo más tarde.';
+                titlesError.classList.remove('hidden');
+            } finally {
+                loadingTitles.classList.add('hidden');
+                this.disabled = false; // Enable button after loading
+            }
+        });
+    </script>
+</body>
+</html>
