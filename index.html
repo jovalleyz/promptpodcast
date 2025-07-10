@@ -71,6 +71,19 @@
         .btn-primary-alt:hover {
             background-color: #0A2463; /* Dark Blue */
         }
+        .btn-apply-title {
+            background-color: #D1D5DB; /* Gray-300 */
+            color: #1F2937; /* Dark Gray Text */
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem; /* rounded-md */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600; /* font-semibold */
+            transition: background-color 0.2s ease-in-out;
+            margin-left: 0.75rem; /* ml-3 */
+        }
+        .btn-apply-title:hover {
+            background-color: #B0B5BB; /* Darker Gray */
+        }
         .prompt-output {
             background-color: #1F2937; /* Dark Gray */
             color: #F7F7F7; /* Light Gray */
@@ -341,9 +354,23 @@
                     if (Array.isArray(parsedJson)) {
                         parsedJson.forEach(title => {
                             const li = document.createElement('li');
-                            li.textContent = title;
+                            li.className = 'flex items-center justify-between mb-2'; // Tailwind for flex layout
+                            li.innerHTML = `
+                                <span>${title}</span>
+                                <button type="button" class="btn-apply-title" data-title="${title}">Aplicar</button>
+                            `;
                             titlesList.appendChild(li);
                         });
+
+                        // Add event listeners to the new "Aplicar" buttons
+                        document.querySelectorAll('.btn-apply-title').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const selectedTitle = this.getAttribute('data-title');
+                                document.getElementById('podcastTitle').value = selectedTitle;
+                                suggestedTitlesContainer.classList.add('hidden'); // Hide suggestions after applying
+                            });
+                        });
+
                     } else {
                         titlesError.textContent = 'Error: La respuesta de la API no tiene el formato esperado.';
                         titlesError.classList.remove('hidden');
